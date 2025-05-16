@@ -1,0 +1,12 @@
+
+- start EC2 linux
+- sudo install python and git
+- put flask in git and then clone in ec2 terminal using "connect button"
+- must use CUSTOM TCP port 5000 0.0.0.0/0 and then can connect using http://publicIP:5000 in browser
+- make sure ssh 22 0.0.0.0/0 allowed for EC2 connect
+
+also attatch s3 access role to ec2 - myS3Role
+
+connect RDS to existing ec2 then get in using: mysql -h <rds-endpoint> -P 3306 -u admin -p
+then run sh create-database.sh
+

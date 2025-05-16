@@ -1,0 +1,10 @@
+- Create ASG 
+- create launch template from link on ASG page - PUT BASH SCRIPT IN LAUNCH TEMPLATE USER DATA with yum, git, pip install requirements and then run flask
+- create new load balancer within ASG (internet facing)
+- remember Target Tracking scaling policy
+- probs make different security groups
+
+
+- RDS free tier
+- Increase lambda timeout + lambda-sg group allowing all outgoing 
+- need to configure endpoint for secrets + s3 as s3 outside of isolated lambda vpc to traffic from lambda-sg - 443 port for secrets and route table for s3
