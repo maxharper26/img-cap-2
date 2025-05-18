@@ -1,15 +1,4 @@
-"""
-COMP5349 Assignment: Image Captioning App using Gemini API and AWS Services
 
-IMPORTANT:
-Before running this application, ensure that you update the following configurations:
-1. Replace the GEMINI API key (`GOOGLE_API_KEY`) with your own key from Google AI Studio.
-2. Replace the AWS S3 bucket name (`S3_BUCKET`) with your own S3 bucket.
-3. Update the RDS MySQL database credentials (`DB_HOST`, `DB_USER`, `DB_PASSWORD`).
-4. Ensure all necessary dependencies are installed by running the provided setup script.
-
-Failure to update these values will result in authentication errors or failure to access cloud services.
-"""
 
 # To use on an AWS Linux instance
 # #!/bin/bash
