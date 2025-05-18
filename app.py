@@ -84,8 +84,9 @@ def upload_image():
         except Exception as e:
             return render_template("upload.html", error=f"S3 Upload Error: {str(e)}")
 
-
-        return render_template("upload.html")
+        encoded_image = base64.b64encode(file_data).decode("utf-8")
+        file_url = f"https://{S3_BUCKET}.s3.{S3_REGION}.amazonaws.com/{filename}"
+        return render_template("upload.html",image_data=encoded_image, file_url=file_url)
 
     return render_template("upload.html")
 
