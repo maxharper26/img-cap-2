@@ -34,7 +34,7 @@ ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 DB_HOST = "img-caption-database.c7nv5bx3rqxu.us-east-1.rds.amazonaws.com"
 DB_NAME = "mydb"
 DB_USER = "admin"
-DB_PASSWORD = "img-cap-pwd300"
+DB_PASSWORD = "img-cap-pwd-300"
 
 def allowed_file(filename):
 
@@ -100,7 +100,7 @@ def gallery():
         if connection is None:
             return render_template("gallery.html", error="Database Error: Unable to connect to the database.")
         cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT image_key, caption FROM captions ORDER BY uploaded_at DESC")
+        cursor.execute("SELECT image_key, caption FROM captions")
         results = cursor.fetchall()
         connection.close()
 
