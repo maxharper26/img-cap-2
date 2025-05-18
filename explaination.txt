@@ -1,0 +1,8 @@
+One vpc 
+Lambda in private subnet and Route to NAT in public subnet with IGW for internet api calls
+Also use VPC endpoints for secretes + s3 access
+Also need inbound on 3306 on RDS from lambda sg
+
+
+Layers: requests, pymysql + pillow ARN: arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p39-pillow:1
+

@@ -7,6 +7,6 @@
 
 also attatch s3 access role to ec2 - myS3Role
 
-connect RDS to existing ec2 then get in using: mysql -h <rds-endpoint> -P 3306 -u admin -p
+connect RDS to existing ec2 then get in using: mysql -h img-caption-database.c7nv5bx3rqxu.us-east-1.rds.amazonaws.com -P 3306 -u admin -p
 then run sh create-database.sh
 

@@ -16,7 +16,6 @@ Failure to update these values will result in authentication errors or failure t
 # sudo yum install python3-pip -y
 # pip install flask
 # pip install mysql-connector-python
-# pip install -q -U google-generativeai
 # pip install boto3 werkzeug
 # sudo yum install -y mariadb105
 
@@ -24,35 +23,9 @@ import boto3  # AWS S3 SDK
 import mysql.connector  # MySQL database connector
 from flask import Flask, request, render_template, jsonify  # Web framework
 from werkzeug.utils import secure_filename  # Secure filename handling
-import google.generativeai as genai  # Gemini API for image captioning
 import base64  # Encoding image data for API processing
 from io import BytesIO  # Handling in-memory file objects
 
-# Configure Gemini API, REPLACE with your Gemini API key
-GOOGLE_API_KEY = ""
-genai.configure(api_key=GOOGLE_API_KEY)
-
-# Choose a Gemini model for generating captions
-model = genai.GenerativeModel(model_name="gemini-2.0-pro-exp-02-05")
-
-def generate_image_caption(image_data):
-    """
-    Generate a caption for an uploaded image using the Gemini API.
-
-    :param image_data: Raw binary image data
-    :return: Generated caption or error message
-    """
-    try:
-        encoded_image = base64.b64encode(image_data).decode("utf-8")
-        response = model.generate_content(
-            [
-                {"mime_type": "image/jpeg", "data": encoded_image},
-                "Caption this image.",
-            ]
-        )
-        return response.text if response.text else "No caption generated."
-    except Exception as e:
-        return f"Error: {str(e)}"
 
 # Flask app setup
 app = Flask(__name__)
@@ -66,18 +39,20 @@ def get_s3_client():
     """Returns a new S3 client that automatically refreshes credentials if using an IAM role."""
     return boto3.client("s3", region_name=S3_REGION)
 
-# Database Configuration, REPLACE with your RDS credentials
-DB_HOST = ""
-DB_NAME = ""
-DB_USER = ""
-DB_PASSWORD = ""
+
+# Allowed file types for upload
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+DB_HOST = "img-caption-database.c7nv5bx3rqxu.us-east-1.rds.amazonaws.com"
+DB_NAME = "mydb"
+DB_USER = "admin"
+DB_PASSWORD = "img-cap-pwd300"
+
+def allowed_file(filename):
+
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def get_db_connection():
-    """
-    Establishes a connection to the MySQL RDS database.
-
-    :return: Database connection object or None if connection fails
-    """
     try:
         connection = mysql.connector.connect(
             host=DB_HOST, database=DB_NAME, user=DB_USER, password=DB_PASSWORD
@@ -86,18 +61,6 @@ def get_db_connection():
     except mysql.connector.Error as err:
         print("Error connecting to database:", err)
         return None
-
-# Allowed file types for upload
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
-
-def allowed_file(filename):
-    """
-    Checks if the uploaded file has a valid extension.
-
-    :param filename: Name of the uploaded file
-    :return: True if valid, False otherwise
-    """
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route("/")
 def upload_form():
@@ -132,29 +95,8 @@ def upload_image():
         except Exception as e:
             return render_template("upload.html", error=f"S3 Upload Error: {str(e)}")
 
-        # Generate caption
-        caption = generate_image_caption(file_data)
 
-        # Save metadata to the database
-        try:
-            connection = get_db_connection()
-            if connection is None:
-                return render_template("upload.html", error="Database Error: Unable to connect to the database.")
-            cursor = connection.cursor()
-            cursor.execute(
-                "INSERT INTO captions (image_key, caption) VALUES (%s, %s)",
-                (filename, caption),
-            )
-            connection.commit()
-            connection.close()
-        except Exception as e:
-            return render_template("upload.html", error=f"Database Error: {str(e)}")
-
-        # Prepare image for frontend display using Base64 encoding
-        encoded_image = base64.b64encode(file_data).decode("utf-8")
-        file_url = f"https://{S3_BUCKET}.s3.{S3_REGION}.amazonaws.com/{filename}"
-
-        return render_template("upload.html", image_data=encoded_image, file_url=file_url, caption=caption)
+        return render_template("upload.html")
 
     return render_template("upload.html")
 
@@ -180,10 +122,16 @@ def gallery():
                     Params={"Bucket": S3_BUCKET, "Key": row["image_key"]},
                     ExpiresIn=3600,  # URL expires in 1 hour
                 ),
+                "thumbail_url": get_s3_client().generate_presigned_url(
+                    "get_object",
+                    Params={"Bucket": S3_BUCKET, "Key": f"thumbnails/{row['image_key']}"},
+                    ExpiresIn=3600,  # URL expires in 1 hour
+                ),
                 "caption": row["caption"],
             }
             for row in results
         ]
+
 
         return render_template("gallery.html", images=images_with_captions)
 

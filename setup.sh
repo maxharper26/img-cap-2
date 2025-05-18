@@ -1,10 +1,12 @@
 #!/bin/bash
 
-# Update package list
-sudo apt-get update
+sudo yum install python3-pip -y
+pip install flask
+pip install mysql-connector-python
+pip install boto3 werkzeug
+sudo yum install -y mariadb105
 
-# Install Python3 and Git
-sudo apt-get install -y python3 python3-pip git
+sudo apt-get install -y git
 
 # Clone the repository (replace with your actual repo URL)
 git clone https://github.com/yourusername/your-repo-name.git

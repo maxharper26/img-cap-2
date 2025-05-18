@@ -1,0 +1,20 @@
+- google.genai layer
+
+
+Create table captions (image_key varchar(100), caption varchar(200), PRIMARY KEY (image_key));
+
+
+aws lambda publish-layer-version \
+  --layer-name googleai-layer \
+  --zip-file fileb://googleai-layer.zip \
+  --compatible-runtimes python3.13
+
+aws lambda publish-layer-version \
+  --layer-name requests-layer \
+  --zip-file fileb://requests-layer.zip \
+  --compatible-runtimes python3.13
+
+aws lambda publish-layer-version \
+  --layer-name pillow-layer \
+  --zip-file fileb://pillow-layer.zip \
+  --compatible-runtimes python3.13
