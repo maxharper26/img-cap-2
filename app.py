@@ -20,7 +20,7 @@ from io import BytesIO  # Handling in-memory file objects
 app = Flask(__name__)
 
 # AWS S3 Configuration, REPLACE with your S3 bucket
-S3_BUCKET = ""
+S3_BUCKET = "img-cap-bucket-v2"
 S3_REGION = "us-east-1"
 
 
